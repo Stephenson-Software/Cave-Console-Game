@@ -14,7 +14,7 @@ python2 maincode.py
 
 ### Known limitation
 
-The game does not currently start on machines other than the author's: the save path at the top of `maincode.py` is a hardcoded absolute Windows path, and it is opened before the first prompt. See [#2](https://github.com/Stephenson-Software/Cave-Console-Game/issues/2).
+The game does not currently run to completion on machines other than the author's: the save path at the top of `maincode.py` is a hardcoded absolute Windows path, and both branches of the opening question open it, so the run ends in an `IOError` after the first answer and before the first decision. See [#2](https://github.com/Stephenson-Software/Cave-Console-Game/issues/2).
 
 ## How to Play
 
@@ -23,6 +23,8 @@ Answers are typed at the `>` prompt and are case-sensitive.
 - `YES` or `NO` — whether a save file exists, whether to enter the cave, and whether to open the chest
 - `DOWN` or `LEAVE` — at the hole in the chest
 - `SAVE` — at any decision, to save progress and quit
+
+Typing `SAVE` at the second or third decision raises a `NameError` when the session was started by loading a save rather than by starting a new game. See [#3](https://github.com/Stephenson-Software/Cave-Console-Game/issues/3).
 
 ## License
 
