@@ -1,0 +1,10 @@
+# Python bytecode
+*.py[cod]
+__pycache__/
+
+# Editor and OS artifacts
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
