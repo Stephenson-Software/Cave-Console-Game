@@ -12,14 +12,7 @@ Python 2. `maincode.py` uses `print` statements and `raw_input()`, so it raises 
 python2 maincode.py
 ```
 
-### Known limitation
-
-The save path at the top of `maincode.py` is a hardcoded absolute Windows path pointing at the author's own machine, and the `savefile.txt` tracked in this repository is never read or written. What that means depends on the platform:
-
-- On another Windows machine, the named directory does not exist, so the run ends in an `IOError` right after the opening question.
-- On Linux or macOS, backslashes are ordinary filename characters rather than path separators. Answering `NO` therefore creates a junk file literally named `C:\Users\Daniel\Desktop\python\ProjectCave\savefile.txt` in the current directory and the game plays on from there, while answering `YES` ends in an `IOError` until such a file exists.
-
-See [#2](https://github.com/Stephenson-Software/Cave-Console-Game/issues/2).
+The game may be started from any working directory; the save path is resolved relative to `maincode.py` itself.
 
 ## How to Play
 
@@ -29,7 +22,9 @@ Answers are typed at the `>` prompt and are case-sensitive.
 - `DOWN` or `LEAVE` — at the hole in the chest
 - `SAVE` — at any decision, to save progress and quit
 
-Typing `SAVE` at the second or third decision raises a `NameError` when the session was started by loading a save rather than by starting a new game. See [#3](https://github.com/Stephenson-Software/Cave-Console-Game/issues/3).
+## Saving
+
+Progress is written to `savefile.txt` beside `maincode.py` — the copy tracked in this repository. Typing `SAVE` records the name of the decision the player stopped at, and answering `YES` to the opening question resumes from it. Because that file is tracked, playing the game leaves a modification in the working tree; `git checkout -- savefile.txt` discards it.
 
 ## License
 
