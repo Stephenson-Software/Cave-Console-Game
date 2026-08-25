@@ -137,8 +137,8 @@ if hassavefile == "YES":
 		
 
 if hassavefile == "NO":
-	savefile = open(save, 'w') #clears any previous save and prepares for saving
-	savefile.close()
+	newsave = open(save, 'w') #clears any previous save and prepares for saving
+	newsave.close()
 	print "\nEnjoy the game! Type SAVE at any time to SAVE and quit."
 	print "----------\n"
 	firstdecision()
