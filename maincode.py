@@ -1,4 +1,6 @@
-save = ("C:\\Users\\Daniel\\Desktop\\python\\ProjectCave\\savefile.txt")
+import os
+
+save = os.path.join(os.path.dirname(os.path.abspath(__file__)), "savefile.txt")
 
 #----------------------------------------------------------------
 # Art
@@ -23,8 +25,12 @@ def hole():
 
 #----------------------------------------------------------------
 # Decisions
+def savegame(decision): #records which decision the player stopped at
+	savefile = open(save, 'w')
+	savefile.write(decision)
+	savefile.close()
+
 def firstdecision():
-	savefile = open(save, 'w') #clears the file and prepares for saving
 	cave()
 	print "\nYou come across a cave! Do you want to go inside? YES or NO?"
 	
@@ -39,7 +45,7 @@ def firstdecision():
 		exit()
 		
 	if goinside == "SAVE":
-		savefile.write("firstdecision") #tells the save file you're at the first decision.
+		savegame("firstdecision") #tells the save file you're at the first decision.
 		raw_input("\nSaving the game, see you later!\n\nPress Enter to exit the program.")
 		quit()
 		
@@ -62,7 +68,7 @@ def seconddecision():
 		exit()
 		
 	if openchest == "SAVE":
-		savefile.write("seconddecision")
+		savegame("seconddecision")
 		raw_input("\nSaving the game, see you later!\n\nPress Enter to exit the program.")
 		quit()
 	else:
@@ -85,7 +91,7 @@ def thirddecision():
 		exit()
 		
 	if thirdanswer == "SAVE":
-		savefile.write("thirddecision")
+		savegame("thirddecision")
 		raw_input("\nSaving the game, see you later!\n\nPress Enter to exit the program.")
 		quit()
 	else:
@@ -102,6 +108,7 @@ hassavefile = raw_input("> ")
 if hassavefile == "YES":
 	loadsavefile = open(save, 'r')
 	savefilecontents = loadsavefile.read()
+	loadsavefile.close()
 	
 	if savefilecontents == "firstdecision":
 		print "\nOkay! Loading up your save!"
@@ -130,7 +137,8 @@ if hassavefile == "YES":
 		
 
 if hassavefile == "NO":
-	savefile = open(save, 'w')
+	newsave = open(save, 'w') #clears any previous save and prepares for saving
+	newsave.close()
 	print "\nEnjoy the game! Type SAVE at any time to SAVE and quit."
 	print "----------\n"
 	firstdecision()
