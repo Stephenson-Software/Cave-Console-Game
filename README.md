@@ -24,7 +24,7 @@ Answers are typed at the `>` prompt and are case-sensitive.
 
 ## Saving
 
-Progress is written to `savefile.txt` beside `maincode.py` — the copy tracked in this repository. Typing `SAVE` records the name of the decision the player stopped at, and answering `YES` to the opening question resumes from it. Because that file is tracked, playing the game leaves a modification in the working tree; `git checkout -- savefile.txt` discards it.
+Progress is written to `savefile.txt` beside `maincode.py` — the copy tracked in this repository. Typing `SAVE` records the name of the decision the player stopped at, and answering `YES` to the opening question resumes from it. Answering `YES` when that file is empty or absent is not an error; the game reports that no save was found and starts from the beginning. Because the file is tracked, playing the game leaves a modification in the working tree; `git checkout -- savefile.txt` discards it.
 
 ## License
 
