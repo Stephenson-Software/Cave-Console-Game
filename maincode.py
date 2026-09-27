@@ -101,52 +101,56 @@ def thirddecision():
 
 # ------------------------------------------------------------------
 # Actual Gameplay - What the user sees
-print "\nWelcome to Cave! Do you have a save file? YES or NO?"
+def main():
+	print "\nWelcome to Cave! Do you have a save file? YES or NO?"
 
-hassavefile = raw_input("> ")
+	hassavefile = raw_input("> ")
 
-if hassavefile == "YES":
-	if os.path.exists(save):
-		loadsavefile = open(save, 'r')
-		savefilecontents = loadsavefile.read()
-		loadsavefile.close()
-	else:
-		savefilecontents = "" #no save file beside maincode.py, so fall through to a new game
+	if hassavefile == "YES":
+		if os.path.exists(save):
+			loadsavefile = open(save, 'r')
+			savefilecontents = loadsavefile.read()
+			loadsavefile.close()
+		else:
+			savefilecontents = "" #no save file beside maincode.py, so fall through to a new game
 	
-	if savefilecontents == "firstdecision":
-		print "\nOkay! Loading up your save!"
-		print "----------\n"
-		firstdecision()
+		if savefilecontents == "firstdecision":
+			print "\nOkay! Loading up your save!"
+			print "----------\n"
+			firstdecision()
 		
-	elif savefilecontents == "seconddecision":
-		print "\nOkay! Loading up your save!"
-		print "----------\n"
-		seconddecision()
+		elif savefilecontents == "seconddecision":
+			print "\nOkay! Loading up your save!"
+			print "----------\n"
+			seconddecision()
 
-	elif savefilecontents == "thirddecision":
-		print "\nOkay! Loading up your save!"
-		print "----------\n"
-		thirddecision()
+		elif savefilecontents == "thirddecision":
+			print "\nOkay! Loading up your save!"
+			print "----------\n"
+			thirddecision()
 		
-	elif savefilecontents == "":
-		print "\nIt doesn't look like you have a save, so we'll start you at the beginning."
+		elif savefilecontents == "":
+			print "\nIt doesn't look like you have a save, so we'll start you at the beginning."
+			print "----------\n"
+			firstdecision()
+		
+		else:
+			print "\nThat wasn't an option! Press Enter to exit the program."
+			raw_input("")
+			quit()
+		
+
+	elif hassavefile == "NO":
+		newsave = open(save, 'w') #clears any previous save and prepares for saving
+		newsave.close()
+		print "\nEnjoy the game! Type SAVE at any time to SAVE and quit."
 		print "----------\n"
 		firstdecision()
-		
+
 	else:
 		print "\nThat wasn't an option! Press Enter to exit the program."
 		raw_input("")
 		quit()
-		
 
-elif hassavefile == "NO":
-	newsave = open(save, 'w') #clears any previous save and prepares for saving
-	newsave.close()
-	print "\nEnjoy the game! Type SAVE at any time to SAVE and quit."
-	print "----------\n"
-	firstdecision()
-
-else:
-		print "\nThat wasn't an option! Press Enter to exit the program."
-		raw_input("")
-		quit()
+if __name__ == "__main__":
+	main()
