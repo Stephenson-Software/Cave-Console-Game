@@ -1,4 +1,5 @@
 import os
+import sys
 
 save = os.path.join(os.path.dirname(os.path.abspath(__file__)), "savefile.txt")
 
@@ -42,17 +43,17 @@ def firstdecision():
 	elif goinside == "NO":
 		print "\nYou sit outside, staring at the sun until you go blind. You live out the rest of your days like that. Game over."
 		raw_input("\nPress Enter to exit the program.")
-		exit()
+		sys.exit()
 		
 	elif goinside == "SAVE":
 		savegame("firstdecision") #tells the save file you're at the first decision.
 		raw_input("\nSaving the game, see you later!\n\nPress Enter to exit the program.")
-		quit()
+		sys.exit()
 		
 	else:
 		print "\nThat wasn't an option! Press Enter to exit the program."
 		raw_input("")
-		quit()
+		sys.exit()
 		
 def seconddecision():
 	chest()
@@ -65,16 +66,16 @@ def seconddecision():
 	elif openchest == "NO":
 		print "\nThe chest suddenly grows a face and looks displeased. It eats you. Game over."
 		raw_input("\nPress Enter to exit the program.")
-		exit()
+		sys.exit()
 		
 	elif openchest == "SAVE":
 		savegame("seconddecision")
 		raw_input("\nSaving the game, see you later!\n\nPress Enter to exit the program.")
-		quit()
+		sys.exit()
 	else:
 		print "\nThat wasn't an option! Press Enter to exit the program."
 		raw_input("")
-		quit()
+		sys.exit()
 
 def thirddecision():
 	hole()
@@ -83,21 +84,21 @@ def thirddecision():
 	if thirdanswer == "DOWN":
 		print "\nAs you begin to descend, the hole tightens around your body, stopping when you can no longer move. You're trapped. Game over."
 		raw_input("\nPress Enter to exit the program.")
-		exit()
+		sys.exit()
 		
 	elif thirdanswer == "LEAVE":
 		print "\nScrew this. You exit the cave, drive home, sit on the couch and crack open a Pepsi. No way to get in trouble here!"
 		raw_input("\nYou won! Press Enter to exit the program.")
-		exit()
+		sys.exit()
 		
 	elif thirdanswer == "SAVE":
 		savegame("thirddecision")
 		raw_input("\nSaving the game, see you later!\n\nPress Enter to exit the program.")
-		quit()
+		sys.exit()
 	else:
 		print "\nThat wasn't an option! Press Enter to exit the program."
 		raw_input("")
-		quit()
+		sys.exit()
 
 # ------------------------------------------------------------------
 # Actual Gameplay - What the user sees
@@ -137,7 +138,7 @@ def main():
 		else:
 			print "\nThat wasn't an option! Press Enter to exit the program."
 			raw_input("")
-			quit()
+			sys.exit()
 		
 
 	elif hassavefile == "NO":
@@ -150,7 +151,7 @@ def main():
 	else:
 		print "\nThat wasn't an option! Press Enter to exit the program."
 		raw_input("")
-		quit()
+		sys.exit()
 
 if __name__ == "__main__":
 	main()
