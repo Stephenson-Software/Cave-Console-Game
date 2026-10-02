@@ -8,3 +8,8 @@ __pycache__/
 *.swp
 .DS_Store
 Thumbs.db
+
+# Browser build output (web/build_zip.py)
+web/index.html
+web/game.zip
+web/version.txt
