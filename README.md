@@ -1,5 +1,7 @@
 # Cave-Console-Game
 
+[![Play in your browser](https://img.shields.io/badge/Play-in%20your%20browser-2ea44f)](https://danielstephenson.dev/play/cave-console-game)
+
 A short console text adventure, written to try out text adventure creation and saving/loading.
 
 ## Requirements
