@@ -26,6 +26,14 @@ Answers are typed at the `>` prompt; case and surrounding spaces do not matter (
 
 Progress is written to `savefile.txt` beside `maincode.py` — the copy tracked in this repository. Typing `SAVE` records the name of the decision the player stopped at, and answering `YES` to the opening question resumes from it. Answering `YES` when that file is empty or absent is not an error; the game reports that no save was found and starts from the beginning. Because the file is tracked, playing the game leaves a modification in the working tree; `git checkout -- savefile.txt` discards it.
 
+## Tests
+
+The tests in `tests/` play the game with scripted answers and check every ending, saving and loading. They use only the standard library and save to a temporary file, so `savefile.txt` is left untouched:
+
+```bash
+python3 -m unittest discover -s tests -t .
+```
+
 ## Play in your browser
 The same game, unmodified, runs in a browser tab under [tak](https://github.com/Stephenson-Software/tak)'s console runtime (Python via Pyodide): https://cave.play.danielstephenson.dev, listed with the rest at [danielstephenson.dev/play](https://danielstephenson.dev/play). To build and serve it locally (needs `tak` installed):
 ```
