@@ -27,6 +27,8 @@ jobs:
           python-version: '3.12'
       - name: Install tak (bundle builder + console runtime)
         run: pip install "tak @ git+https://github.com/Stephenson-Software/tak@1bac386777d4b2468faeda00b31e960af8d57164"
+      - name: Unit tests
+        run: python3 -m unittest discover -s tests -t .
       - name: The game plays through in a terminal (Python 3)
         run: printf 'NO\nYES\nYES\nLEAVE\n\n' | python3 maincode.py
       - name: Build the browser bundle
