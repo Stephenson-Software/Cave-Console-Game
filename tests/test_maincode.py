@@ -6,6 +6,9 @@ temporary file, so the tracked savefile.txt is never touched.
 
 import io
 import os
+import shutil
+import subprocess
+import sys
 import tempfile
 import unittest
 from contextlib import redirect_stdout
@@ -135,6 +138,37 @@ class TestLoading(GameTestCase):
 		output = self.play("YES", "")
 		self.assertIn("That wasn't an option!", output)
 		self.assertNotIn("Loading up your save!", output)
+
+
+class TestRunningAsAScript(unittest.TestCase):
+
+	def run_copy(self, answers):
+		"""Run a copy of maincode.py from an unrelated working directory.
+
+		Returns (the copy's directory, the working directory, the completed process).
+		"""
+		gamedirectory = tempfile.TemporaryDirectory()
+		self.addCleanup(gamedirectory.cleanup)
+		workingdirectory = tempfile.TemporaryDirectory()
+		self.addCleanup(workingdirectory.cleanup)
+		shutil.copy(maincode.__file__, gamedirectory.name)
+		process = subprocess.run(
+			[sys.executable, os.path.join(gamedirectory.name, "maincode.py")],
+			input=answers, cwd=workingdirectory.name,
+			capture_output=True, text=True, timeout=30)
+		return gamedirectory.name, workingdirectory.name, process
+
+	def test_script_plays_through_to_an_ending(self):
+		_, _, process = self.run_copy("NO\nYES\nYES\nLEAVE\n\n")
+		self.assertEqual(process.returncode, 0, process.stderr)
+		self.assertIn("crack open a Pepsi", process.stdout)
+
+	def test_save_is_written_beside_maincode_not_in_the_working_directory(self):
+		gamedirectory, workingdirectory, process = self.run_copy("NO\nSAVE\n\n")
+		self.assertEqual(process.returncode, 0, process.stderr)
+		with open(os.path.join(gamedirectory, "savefile.txt")) as savefile:
+			self.assertEqual(savefile.read(), "firstdecision")
+		self.assertEqual(os.listdir(workingdirectory), [])
 
 
 if __name__ == "__main__":
