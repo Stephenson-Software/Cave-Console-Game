@@ -110,7 +110,7 @@ def main():
 	if hassavefile == "YES":
 		if os.path.exists(save):
 			loadsavefile = open(save, 'r')
-			savefilecontents = loadsavefile.read()
+			savefilecontents = loadsavefile.read().strip()
 			loadsavefile.close()
 		else:
 			savefilecontents = "" #no save file beside maincode.py, so fall through to a new game
@@ -136,7 +136,7 @@ def main():
 			firstdecision()
 		
 		else:
-			print("\nThat wasn't an option! Press Enter to exit the program.")
+			print("\nYour save file couldn't be read. Answer NO next time to start a new game. Press Enter to exit the program.")
 			input("")
 			sys.exit()
 		

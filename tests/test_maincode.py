@@ -133,10 +133,17 @@ class TestLoading(GameTestCase):
 		self.assertIn("It doesn't look like you have a save", output)
 		self.assertIn("You come across a cave!", output)
 
+	def test_save_surrounded_by_whitespace_still_loads(self):
+		self.writesave("seconddecision\n")
+		output = self.play("YES", "SAVE", "")
+		self.assertIn("Loading up your save!", output)
+		self.assertIn("You find a treasure chest in the cave!", output)
+
 	def test_unrecognized_save_contents_end_the_program(self):
 		self.writesave("fourthdecision")
 		output = self.play("YES", "")
-		self.assertIn("That wasn't an option!", output)
+		self.assertIn("Your save file couldn't be read.", output)
+		self.assertNotIn("That wasn't an option!", output)
 		self.assertNotIn("Loading up your save!", output)
 
 
