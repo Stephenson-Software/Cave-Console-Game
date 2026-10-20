@@ -154,4 +154,8 @@ def main():
 		sys.exit()
 
 if __name__ == "__main__":
-	main()
+	try:
+		main()
+	except EOFError: #input ended (Ctrl-D, or a pipe ran out of answers), so quit instead of crashing
+		print("")
+		sys.exit()

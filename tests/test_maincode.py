@@ -177,6 +177,24 @@ class TestRunningAsAScript(unittest.TestCase):
 			self.assertEqual(savefile.read(), "firstdecision")
 		self.assertEqual(os.listdir(workingdirectory), [])
 
+	def test_end_of_input_at_an_ending_exits_cleanly(self):
+		_, _, process = self.run_copy("NO\nNO\n")
+		self.assertEqual(process.returncode, 0, process.stderr)
+		self.assertEqual(process.stderr, "")
+		self.assertIn("Game over.", process.stdout)
+
+	def test_end_of_input_at_a_decision_exits_cleanly(self):
+		_, _, process = self.run_copy("NO\n")
+		self.assertEqual(process.returncode, 0, process.stderr)
+		self.assertEqual(process.stderr, "")
+		self.assertIn("You come across a cave!", process.stdout)
+
+	def test_end_of_input_after_saving_keeps_the_save(self):
+		gamedirectory, _, process = self.run_copy("NO\nYES\nSAVE\n")
+		self.assertEqual(process.returncode, 0, process.stderr)
+		with open(os.path.join(gamedirectory, "savefile.txt")) as savefile:
+			self.assertEqual(savefile.read(), "seconddecision")
+
 
 if __name__ == "__main__":
 	unittest.main()
