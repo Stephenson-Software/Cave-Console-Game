@@ -24,7 +24,7 @@ Answers are typed at the `>` prompt; case and surrounding spaces do not matter (
 - `DOWN` or `LEAVE` — at the hole in the chest
 - `SAVE` — at any decision, to save progress and quit
 
-Ending input (Ctrl-D, or Ctrl-Z then Enter on Windows) quits the game without saving.
+Ending input (Ctrl-D, or Ctrl-Z then Enter on Windows) or pressing Ctrl-C quits the game without saving.
 
 ## Saving
 

@@ -156,6 +156,6 @@ def main():
 if __name__ == "__main__":
 	try:
 		main()
-	except EOFError: #input ended (Ctrl-D, or a pipe ran out of answers), so quit instead of crashing
+	except (EOFError, KeyboardInterrupt): #input ended (Ctrl-D, or a pipe ran out of answers) or Ctrl-C was pressed, so quit instead of crashing
 		print("")
 		sys.exit()

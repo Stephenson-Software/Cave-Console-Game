@@ -7,6 +7,7 @@ temporary file, so the tracked savefile.txt is never touched.
 import io
 import os
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -188,6 +189,23 @@ class TestRunningAsAScript(unittest.TestCase):
 		self.assertEqual(process.returncode, 0, process.stderr)
 		self.assertEqual(process.stderr, "")
 		self.assertIn("You come across a cave!", process.stdout)
+
+	@unittest.skipIf(sys.platform == "win32", "SIGINT cannot be sent to a child process on Windows")
+	def test_ctrl_c_at_a_prompt_exits_cleanly(self):
+		gamedirectory = tempfile.TemporaryDirectory()
+		self.addCleanup(gamedirectory.cleanup)
+		shutil.copy(maincode.__file__, gamedirectory.name)
+		process = subprocess.Popen(
+			[sys.executable, os.path.join(gamedirectory.name, "maincode.py")],
+			stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+		self.addCleanup(process.kill)
+		# The welcome line is flushed when the game waits for the first answer.
+		self.assertIn("Welcome to Cave!", process.stdout.readline() + process.stdout.readline())
+		process.send_signal(signal.SIGINT)
+		stdout, stderr = process.communicate(timeout=30)
+		self.assertEqual(process.returncode, 0, stderr)
+		self.assertEqual(stderr, "")
+		self.assertNotIn("savefile.txt", os.listdir(gamedirectory.name))
 
 	def test_end_of_input_after_saving_keeps_the_save(self):
 		gamedirectory, _, process = self.run_copy("NO\nYES\nSAVE\n")
