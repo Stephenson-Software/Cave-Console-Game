@@ -202,7 +202,7 @@ class TestRunningAsAScript(unittest.TestCase):
 		# The welcome line is flushed when the game waits for the first answer.
 		self.assertIn("Welcome to Cave!", process.stdout.readline() + process.stdout.readline())
 		process.send_signal(signal.SIGINT)
-		stdout, stderr = process.communicate(timeout=30)
+		_, stderr = process.communicate(timeout=30)
 		self.assertEqual(process.returncode, 0, stderr)
 		self.assertEqual(stderr, "")
 		self.assertNotIn("savefile.txt", os.listdir(gamedirectory.name))
