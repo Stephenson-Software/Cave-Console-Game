@@ -140,6 +140,16 @@ class TestLoading(GameTestCase):
 		self.assertIn("Loading up your save!", output)
 		self.assertIn("You find a treasure chest in the cave!", output)
 
+	def test_every_way_into_the_game_mentions_save(self):
+		for contents in ("", "firstdecision", "seconddecision", "thirddecision"):
+			with self.subTest(contents=contents):
+				self.writesave(contents)
+				output = self.play("YES", "SAVE", "")
+				self.assertIn("Type SAVE at any time to SAVE and quit.", output)
+		with self.subTest(contents="new game"):
+			output = self.play("NO", "SAVE", "")
+			self.assertIn("Type SAVE at any time to SAVE and quit.", output)
+
 	def test_unrecognized_save_contents_end_the_program(self):
 		self.writesave("fourthdecision")
 		output = self.play("YES", "")
