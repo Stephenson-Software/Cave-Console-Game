@@ -116,22 +116,22 @@ def main():
 			savefilecontents = "" #no save file beside maincode.py, so fall through to a new game
 	
 		if savefilecontents == "firstdecision":
-			print("\nOkay! Loading up your save!")
+			print("\nOkay! Loading up your save! Type SAVE at any time to SAVE and quit.")
 			print("----------\n")
 			firstdecision()
 		
 		elif savefilecontents == "seconddecision":
-			print("\nOkay! Loading up your save!")
+			print("\nOkay! Loading up your save! Type SAVE at any time to SAVE and quit.")
 			print("----------\n")
 			seconddecision()
 
 		elif savefilecontents == "thirddecision":
-			print("\nOkay! Loading up your save!")
+			print("\nOkay! Loading up your save! Type SAVE at any time to SAVE and quit.")
 			print("----------\n")
 			thirddecision()
 		
 		elif savefilecontents == "":
-			print("\nIt doesn't look like you have a save, so we'll start you at the beginning.")
+			print("\nIt doesn't look like you have a save, so we'll start you at the beginning. Type SAVE at any time to SAVE and quit.")
 			print("----------\n")
 			firstdecision()
 		
