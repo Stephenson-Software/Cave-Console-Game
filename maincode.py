@@ -26,10 +26,20 @@ def hole():
 
 #----------------------------------------------------------------
 # Decisions
-def savegame(decision): #records which decision the player stopped at
-	savefile = open(save, 'w')
-	savefile.write(decision)
-	savefile.close()
+def savegame(decision): #records which decision the player stopped at; returns False if the save file couldn't be written
+	try:
+		with open(save, 'w') as savefile:
+			savefile.write(decision)
+	except OSError:
+		return False
+	return True
+
+def saveandquit(decision):
+	if savegame(decision):
+		input("\nSaving the game, see you later!\n\nPress Enter to exit the program.")
+	else:
+		input("\nYour game couldn't be saved, because your save file (savefile.txt beside maincode.py) can't be written. Press Enter to exit the program.")
+	sys.exit()
 
 def firstdecision():
 	cave()
@@ -46,9 +56,7 @@ def firstdecision():
 		sys.exit()
 		
 	elif goinside == "SAVE":
-		savegame("firstdecision") #tells the save file you're at the first decision.
-		input("\nSaving the game, see you later!\n\nPress Enter to exit the program.")
-		sys.exit()
+		saveandquit("firstdecision") #tells the save file you're at the first decision.
 		
 	else:
 		print("\nThat wasn't an option! Press Enter to exit the program.")
@@ -69,9 +77,7 @@ def seconddecision():
 		sys.exit()
 		
 	elif openchest == "SAVE":
-		savegame("seconddecision")
-		input("\nSaving the game, see you later!\n\nPress Enter to exit the program.")
-		sys.exit()
+		saveandquit("seconddecision")
 	else:
 		print("\nThat wasn't an option! Press Enter to exit the program.")
 		input("")
@@ -92,9 +98,7 @@ def thirddecision():
 		sys.exit()
 		
 	elif thirdanswer == "SAVE":
-		savegame("thirddecision")
-		input("\nSaving the game, see you later!\n\nPress Enter to exit the program.")
-		sys.exit()
+		saveandquit("thirddecision")
 	else:
 		print("\nThat wasn't an option! Press Enter to exit the program.")
 		input("")
@@ -142,8 +146,8 @@ def main():
 		
 
 	elif hassavefile == "NO":
-		newsave = open(save, 'w') #clears any previous save and prepares for saving
-		newsave.close()
+		if not savegame(""): #clears any previous save and prepares for saving
+			print("\nYour save file (savefile.txt beside maincode.py) can't be written, so saving won't work this game.")
 		print("\nEnjoy the game! Type SAVE at any time to SAVE and quit.")
 		print("----------\n")
 		firstdecision()
