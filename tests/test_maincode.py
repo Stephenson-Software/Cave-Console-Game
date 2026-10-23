@@ -158,6 +158,41 @@ class TestLoading(GameTestCase):
 		self.assertNotIn("Loading up your save!", output)
 
 
+class TestUnwritableSaveFile(GameTestCase):
+
+	def setUp(self):
+		super().setUp()
+		# A save path inside a directory that doesn't exist can't be written, as in a read-only install.
+		unwritable = os.path.join(os.path.dirname(self.savepath), "missing", "savefile.txt")
+		patcher = mock.patch.object(maincode, "save", unwritable)
+		patcher.start()
+		self.addCleanup(patcher.stop)
+
+	def play(self, *answers):
+		"""Like GameTestCase.play, but the output also includes the prompts passed to input()."""
+		remaining = list(answers)
+		def answer(prompt=""):
+			print(prompt)
+			return remaining.pop(0)
+		output = io.StringIO()
+		with mock.patch("builtins.input", side_effect=answer), redirect_stdout(output):
+			with self.assertRaises(SystemExit):
+				maincode.main()
+		return output.getvalue()
+
+	def test_new_game_still_starts(self):
+		output = self.play("NO", "YES", "YES", "LEAVE", "")
+		self.assertIn("Your save file (savefile.txt beside maincode.py) can't be written", output)
+		self.assertIn("crack open a Pepsi", output)
+
+	def test_save_reports_that_the_game_was_not_saved(self):
+		for answers in (("NO", "SAVE"), ("NO", "YES", "SAVE"), ("NO", "YES", "YES", "SAVE")):
+			with self.subTest(answers=answers):
+				output = self.play(*answers, "")
+				self.assertIn("Your game couldn't be saved", output)
+				self.assertNotIn("see you later!", output)
+
+
 class TestRunningAsAScript(unittest.TestCase):
 
 	def run_copy(self, answers):
