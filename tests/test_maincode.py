@@ -157,6 +157,20 @@ class TestLoading(GameTestCase):
 		self.assertNotIn("That wasn't an option!", output)
 		self.assertNotIn("Loading up your save!", output)
 
+	def test_save_that_is_not_text_ends_the_program(self):
+		with open(self.savepath, "wb") as savefile:
+			savefile.write(b"\xff\xfe\x00")
+		output = self.play("YES", "")
+		self.assertIn("Your save file couldn't be read.", output)
+		self.assertNotIn("Loading up your save!", output)
+
+	def test_save_that_cannot_be_opened_ends_the_program(self):
+		# A directory where the save file should be can't be opened for reading, as with a save file the player can't read.
+		os.mkdir(self.savepath)
+		output = self.play("YES", "")
+		self.assertIn("Your save file couldn't be read.", output)
+		self.assertNotIn("Loading up your save!", output)
+
 
 class TestUnwritableSaveFile(GameTestCase):
 

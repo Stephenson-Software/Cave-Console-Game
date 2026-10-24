@@ -113,9 +113,11 @@ def main():
 
 	if hassavefile == "YES":
 		if os.path.exists(save):
-			loadsavefile = open(save, 'r')
-			savefilecontents = loadsavefile.read().strip()
-			loadsavefile.close()
+			try:
+				with open(save, 'r') as loadsavefile:
+					savefilecontents = loadsavefile.read().strip()
+			except (OSError, UnicodeDecodeError):
+				savefilecontents = None #the save file is there but can't be opened or decoded, so it's reported as unreadable below
 		else:
 			savefilecontents = "" #no save file beside maincode.py, so fall through to a new game
 	
