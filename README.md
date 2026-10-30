@@ -22,7 +22,9 @@ Answers are typed at the `>` prompt; case and surrounding spaces do not matter (
 
 - `YES` or `NO` — whether a save file exists, whether to enter the cave, and whether to open the chest
 - `DOWN` or `LEAVE` — at the hole in the chest
-- `SAVE` — at any decision, to save progress and quit
+- `SAVE` — at any decision after the opening question, to save progress and quit
+
+Any other answer ends the game with `That wasn't an option!`. A save made earlier is kept, so answering `YES` to the opening question next time resumes from it.
 
 Ending input (Ctrl-D, or Ctrl-Z then Enter on Windows) or pressing Ctrl-C quits the game without saving.
 
