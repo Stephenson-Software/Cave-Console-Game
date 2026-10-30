@@ -83,6 +83,12 @@ class TestInvalidAnswers(GameTestCase):
 				output = self.play(*answers, "")
 				self.assertIn("That wasn't an option!", output)
 
+	def test_invalid_answer_keeps_an_earlier_save(self):
+		self.writesave("seconddecision")
+		output = self.play("YES", "MAYBE", "")
+		self.assertIn("That wasn't an option!", output)
+		self.assertEqual(self.readsave(), "seconddecision")
+
 
 class TestSaving(GameTestCase):
 
