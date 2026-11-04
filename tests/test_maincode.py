@@ -100,7 +100,7 @@ class TestEndings(GameTestCase):
 class TestPrompts(GameTestCase):
 
 	def test_opening_question_lists_its_answers(self):
-		output = self.play("MAYBE", "")
+		output = self.play("NO", "NO", "")
 		self.assertIn("Do you have a save file? YES or NO?", output)
 
 	def test_each_decision_shows_its_art_before_listing_its_answers(self):
