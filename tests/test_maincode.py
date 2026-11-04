@@ -29,11 +29,26 @@ class GameTestCase(unittest.TestCase):
 		self.addCleanup(patcher.stop)
 
 	def play(self, *answers):
-		"""Run main() with the given answers; return everything it printed."""
+		"""Run main() with the given answers; return what it printed, including the prompts passed to input().
+
+		Every answer must be used, so a test also fails if the game stops asking early.
+		"""
+		remaining = list(answers)
+		def answer(prompt=""):
+			print(prompt)
+			return remaining.pop(0)
 		output = io.StringIO()
-		with mock.patch("builtins.input", side_effect=list(answers)), redirect_stdout(output):
+		with mock.patch("builtins.input", side_effect=answer), redirect_stdout(output):
 			with self.assertRaises(SystemExit):
 				maincode.main()
+		self.assertEqual(remaining, [])
+		return output.getvalue()
+
+	def printedby(self, function):
+		"""Return what the given art function prints."""
+		output = io.StringIO()
+		with redirect_stdout(output):
+			function()
 		return output.getvalue()
 
 	def writesave(self, contents):
@@ -63,11 +78,46 @@ class TestEndings(GameTestCase):
 	def test_leaving_the_cave_wins(self):
 		output = self.play("NO", "YES", "YES", "LEAVE", "")
 		self.assertIn("crack open a Pepsi", output)
+		self.assertIn("You won!", output)
 		self.assertNotIn("Game over.", output)
 
 	def test_answers_ignore_case_and_surrounding_spaces(self):
 		output = self.play(" no ", "yes", " Yes", "leave ", "")
 		self.assertIn("crack open a Pepsi", output)
+
+	def test_every_ending_says_how_to_exit(self):
+		for answers in (("NO", "NO"), ("NO", "YES", "NO"), ("NO", "YES", "YES", "DOWN"), ("NO", "YES", "YES", "LEAVE")):
+			with self.subTest(answers=answers):
+				output = self.play(*answers, "")
+				self.assertTrue(output.rstrip().endswith("Press Enter to exit the program."), output)
+
+	def test_reaching_an_ending_keeps_the_save_it_resumed_from(self):
+		self.writesave("thirddecision")
+		self.play("YES", "DOWN", "")
+		self.assertEqual(self.readsave(), "thirddecision")
+
+
+class TestPrompts(GameTestCase):
+
+	def test_opening_question_lists_its_answers(self):
+		output = self.play("MAYBE", "")
+		self.assertIn("Do you have a save file? YES or NO?", output)
+
+	def test_each_decision_shows_its_art_before_listing_its_answers(self):
+		for answers, art, question in (
+				(("NO",), maincode.cave, "Do you want to go inside? YES or NO?"),
+				(("NO", "YES"), maincode.chest, "Do you want to open it? YES or NO?"),
+				(("NO", "YES", "YES"), maincode.hole, "DOWN or LEAVE?")):
+			with self.subTest(question=question):
+				output = self.play(*answers, "SAVE", "")
+				artoutput = self.printedby(art)
+				self.assertIn(artoutput, output)
+				self.assertLess(output.rindex(artoutput), output.index(question))
+
+	def test_new_game_welcomes_the_player_without_a_warning(self):
+		output = self.play("NO", "NO", "")
+		self.assertIn("Enjoy the game!", output)
+		self.assertNotIn("can't be written", output)
 
 
 class TestInvalidAnswers(GameTestCase):
@@ -103,8 +153,10 @@ class TestSaving(GameTestCase):
 				(("NO", "YES", "SAVE"), "seconddecision"),
 				(("NO", "YES", "YES", "SAVE"), "thirddecision")):
 			with self.subTest(decision=decision):
-				self.play(*answers, "")
+				output = self.play(*answers, "")
 				self.assertEqual(self.readsave(), decision)
+				self.assertIn("Saving the game, see you later!", output)
+				self.assertNotIn("couldn't be saved", output)
 
 
 class TestLoading(GameTestCase):
@@ -136,6 +188,12 @@ class TestLoading(GameTestCase):
 
 	def test_missing_save_starts_from_the_beginning(self):
 		self.assertFalse(os.path.exists(self.savepath))
+		output = self.play("YES", "NO", "")
+		self.assertIn("It doesn't look like you have a save", output)
+		self.assertIn("You come across a cave!", output)
+
+	def test_save_of_only_whitespace_starts_from_the_beginning(self):
+		self.writesave("  \n")
 		output = self.play("YES", "NO", "")
 		self.assertIn("It doesn't look like you have a save", output)
 		self.assertIn("You come across a cave!", output)
@@ -187,18 +245,6 @@ class TestUnwritableSaveFile(GameTestCase):
 		patcher = mock.patch.object(maincode, "save", unwritable)
 		patcher.start()
 		self.addCleanup(patcher.stop)
-
-	def play(self, *answers):
-		"""Like GameTestCase.play, but the output also includes the prompts passed to input()."""
-		remaining = list(answers)
-		def answer(prompt=""):
-			print(prompt)
-			return remaining.pop(0)
-		output = io.StringIO()
-		with mock.patch("builtins.input", side_effect=answer), redirect_stdout(output):
-			with self.assertRaises(SystemExit):
-				maincode.main()
-		return output.getvalue()
 
 	def test_new_game_still_starts(self):
 		output = self.play("NO", "YES", "YES", "LEAVE", "")
@@ -254,6 +300,8 @@ class TestRunningAsAScript(unittest.TestCase):
 		self.assertEqual(process.returncode, 0, process.stderr)
 		self.assertEqual(process.stderr, "")
 		self.assertIn("You come across a cave!", process.stdout)
+		# The prompt's line is finished, so the shell's prompt doesn't land on it.
+		self.assertTrue(process.stdout.endswith("> \n"), process.stdout)
 
 	@unittest.skipIf(sys.platform == "win32", "SIGINT cannot be sent to a child process on Windows")
 	def test_ctrl_c_at_a_prompt_exits_cleanly(self):
