@@ -26,7 +26,7 @@ Answers are typed at the `>` prompt; case and surrounding spaces do not matter (
 
 Any other answer ends the game with `That wasn't an option!`. A save made earlier is kept, so answering `YES` to the opening question next time resumes from it.
 
-Ending input (Ctrl-D, or Ctrl-Z then Enter on Windows) or pressing Ctrl-C quits the game without saving.
+Ending input (Ctrl-D, or Ctrl-Z then Enter on Windows) or pressing Ctrl-C quits the game without saving. So does input Python can't decode as text; depending on the terminal's locale, the same bytes may instead be read as an unlisted answer.
 
 ## Saving
 
