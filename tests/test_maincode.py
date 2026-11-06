@@ -326,6 +326,24 @@ class TestRunningAsAScript(unittest.TestCase):
 		with open(os.path.join(gamedirectory, "savefile.txt")) as savefile:
 			self.assertEqual(savefile.read(), "seconddecision")
 
+	def test_input_that_is_not_text_exits_cleanly(self):
+		# Python reads ahead, so the whole pipe is decoded at the first prompt, wherever the bad byte is.
+		for answers in (b"\xff\nNO\n\n", b"NO\nYES\n\xff\n\n"):
+			with self.subTest(answers=answers):
+				gamedirectory = tempfile.TemporaryDirectory()
+				self.addCleanup(gamedirectory.cleanup)
+				shutil.copy(maincode.__file__, gamedirectory.name)
+				process = subprocess.run(
+					[sys.executable, os.path.join(gamedirectory.name, "maincode.py")],
+					input=answers, env=dict(os.environ, PYTHONIOENCODING="utf-8:strict"),
+					capture_output=True, timeout=30)
+				self.assertEqual(process.returncode, 0, process.stderr)
+				self.assertEqual(process.stderr, b"")
+				self.assertIn(b"Welcome to Cave!", process.stdout)
+				# The prompt's line is finished, so the shell's prompt doesn't land on it.
+				self.assertTrue(process.stdout.endswith((b"> \n", b"> \r\n")), process.stdout)
+				self.assertNotIn("savefile.txt", os.listdir(gamedirectory.name))
+
 
 if __name__ == "__main__":
 	unittest.main()
