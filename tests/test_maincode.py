@@ -82,7 +82,7 @@ class TestEndings(GameTestCase):
 		self.assertNotIn("Game over.", output)
 
 	def test_answers_ignore_case_and_surrounding_spaces(self):
-		output = self.play(" no ", "yes", " Yes", "leave ", "")
+		output = self.play(" no ", " yes ", " Yes", "leave ", "")
 		self.assertIn("crack open a Pepsi", output)
 
 	def test_every_ending_says_how_to_exit(self):
@@ -119,19 +119,33 @@ class TestPrompts(GameTestCase):
 		self.assertIn("Enjoy the game!", output)
 		self.assertNotIn("can't be written", output)
 
+	def test_every_question_is_answered_at_a_prompt(self):
+		output = self.play("NO", "YES", "YES", "LEAVE", "")
+		self.assertEqual(output.count("\n> \n"), 4)
+
+	def test_every_way_into_the_game_prints_a_divider_after_the_introduction(self):
+		for contents in ("", "firstdecision", "seconddecision", "thirddecision"):
+			with self.subTest(contents=contents):
+				self.writesave(contents)
+				output = self.play("YES", "SAVE", "")
+				self.assertIn("SAVE and quit.\n----------\n", output)
+		with self.subTest(contents="new game"):
+			output = self.play("NO", "SAVE", "")
+			self.assertIn("SAVE and quit.\n----------\n", output)
+
 
 class TestInvalidAnswers(GameTestCase):
 
 	def test_invalid_answer_to_the_opening_question(self):
 		output = self.play("MAYBE", "")
-		self.assertIn("That wasn't an option!", output)
+		self.assertIn("That wasn't an option! Press Enter to exit the program.", output)
 		self.assertNotIn("You come across a cave!", output)
 
 	def test_invalid_answer_at_each_decision(self):
 		for answers in (("NO", "MAYBE"), ("NO", "YES", "MAYBE"), ("NO", "YES", "YES", "MAYBE")):
 			with self.subTest(answers=answers):
 				output = self.play(*answers, "")
-				self.assertIn("That wasn't an option!", output)
+				self.assertIn("That wasn't an option! Press Enter to exit the program.", output)
 
 	def test_invalid_answer_keeps_an_earlier_save(self):
 		self.writesave("seconddecision")
@@ -157,6 +171,7 @@ class TestSaving(GameTestCase):
 				self.assertEqual(self.readsave(), decision)
 				self.assertIn("Saving the game, see you later!", output)
 				self.assertNotIn("couldn't be saved", output)
+				self.assertTrue(output.rstrip().endswith("Press Enter to exit the program."), output)
 
 
 class TestLoading(GameTestCase):
@@ -217,7 +232,7 @@ class TestLoading(GameTestCase):
 	def test_unrecognized_save_contents_end_the_program(self):
 		self.writesave("fourthdecision")
 		output = self.play("YES", "")
-		self.assertIn("Your save file couldn't be read.", output)
+		self.assertIn("Your save file couldn't be read. Answer NO next time to start a new game. Press Enter to exit the program.", output)
 		self.assertNotIn("That wasn't an option!", output)
 		self.assertNotIn("Loading up your save!", output)
 
@@ -257,6 +272,7 @@ class TestUnwritableSaveFile(GameTestCase):
 				output = self.play(*answers, "")
 				self.assertIn("Your game couldn't be saved", output)
 				self.assertNotIn("see you later!", output)
+				self.assertTrue(output.rstrip().endswith("Press Enter to exit the program."), output)
 
 
 class TestRunningAsAScript(unittest.TestCase):
