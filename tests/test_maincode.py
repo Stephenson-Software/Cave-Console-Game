@@ -360,6 +360,23 @@ class TestRunningAsAScript(unittest.TestCase):
 				self.assertTrue(process.stdout.endswith((b"> \n", b"> \r\n")), process.stdout)
 				self.assertNotIn("savefile.txt", os.listdir(gamedirectory.name))
 
+	@unittest.skipIf(sys.platform == "win32", "a child's standard streams cannot be closed with preexec_fn on Windows")
+	def test_closed_stdin_or_stdout_exits_cleanly(self):
+		for descriptor in (0, 1):
+			with self.subTest(closed=descriptor):
+				gamedirectory = tempfile.TemporaryDirectory()
+				self.addCleanup(gamedirectory.cleanup)
+				shutil.copy(maincode.__file__, gamedirectory.name)
+				# The same as starting the game with `<&-` or `>&-` in a shell.
+				process = subprocess.run(
+					[sys.executable, os.path.join(gamedirectory.name, "maincode.py")],
+					preexec_fn=lambda: os.close(descriptor),
+					stdout=subprocess.DEVNULL if descriptor == 1 else subprocess.PIPE,
+					stderr=subprocess.PIPE, text=True, timeout=30)
+				self.assertEqual(process.returncode, 0, process.stderr)
+				self.assertEqual(process.stderr, "")
+				self.assertNotIn("savefile.txt", os.listdir(gamedirectory.name))
+
 
 if __name__ == "__main__":
 	unittest.main()
