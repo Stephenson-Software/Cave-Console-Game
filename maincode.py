@@ -160,6 +160,8 @@ def main():
 		sys.exit()
 
 if __name__ == "__main__":
+	if sys.stdin is None or sys.stdout is None: #stdin or stdout was closed before the game started, so no question can be asked or answered; quit instead of crashing
+		sys.exit()
 	try:
 		main()
 	except (EOFError, KeyboardInterrupt, UnicodeDecodeError): #input ended (Ctrl-D, or a pipe ran out of answers), Ctrl-C was pressed, or the input wasn't valid text, so quit instead of crashing
