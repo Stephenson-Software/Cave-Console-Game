@@ -153,6 +153,13 @@ class TestInvalidAnswers(GameTestCase):
 		self.assertIn("That wasn't an option!", output)
 		self.assertEqual(self.readsave(), "seconddecision")
 
+	def test_save_is_not_an_answer_to_the_opening_question(self):
+		self.writesave("thirddecision")
+		output = self.play("SAVE", "")
+		self.assertIn("That wasn't an option! Press Enter to exit the program.", output)
+		self.assertNotIn("Saving the game", output)
+		self.assertEqual(self.readsave(), "thirddecision")
+
 
 class TestSaving(GameTestCase):
 
