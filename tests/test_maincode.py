@@ -180,6 +180,19 @@ class TestSaving(GameTestCase):
 				self.assertNotIn("couldn't be saved", output)
 				self.assertTrue(output.rstrip().endswith("Press Enter to exit the program."), output)
 
+	def test_saving_after_resuming_records_the_new_progress(self):
+		# The saved names differ in length, so leftovers from the old save would show up in the new one.
+		for saved, answers, decision in (
+				("firstdecision", ("YES", "YES", "SAVE"), "seconddecision"),
+				("firstdecision", ("YES", "YES", "YES", "SAVE"), "thirddecision"),
+				("seconddecision", ("YES", "YES", "SAVE"), "thirddecision")):
+			with self.subTest(saved=saved, decision=decision):
+				self.writesave(saved)
+				output = self.play(*answers, "")
+				self.assertIn("Loading up your save!", output)
+				self.assertIn("Saving the game, see you later!", output)
+				self.assertEqual(self.readsave(), decision)
+
 
 class TestLoading(GameTestCase):
 
