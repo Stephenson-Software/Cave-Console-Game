@@ -181,7 +181,7 @@ class TestSaving(GameTestCase):
 				self.assertTrue(output.rstrip().endswith("Press Enter to exit the program."), output)
 
 	def test_saving_after_resuming_records_the_new_progress(self):
-		# The saved names differ in length, so leftovers from the old save would show up in the new one.
+		# The last case replaces a longer saved name with a shorter one, so leftovers from the old save would show up in the new one.
 		for saved, answers, decision in (
 				("firstdecision", ("YES", "YES", "SAVE"), "seconddecision"),
 				("firstdecision", ("YES", "YES", "YES", "SAVE"), "thirddecision"),
