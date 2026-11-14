@@ -168,6 +168,24 @@ class TestSaving(GameTestCase):
 		self.play("NO", "NO", "")
 		self.assertEqual(self.readsave(), "")
 
+	def test_starting_a_new_game_clears_an_unreadable_save(self):
+		for contents in (b"fourthdecision", b"\xff\xfe\x00"):
+			with self.subTest(contents=contents):
+				with open(self.savepath, "wb") as savefile:
+					savefile.write(contents)
+				output = self.play("NO", "NO", "")
+				self.assertNotIn("can't be written", output)
+				with open(self.savepath, "rb") as savefile:
+					self.assertEqual(savefile.read(), b"")
+
+	def test_starting_a_new_game_keeps_a_save_that_cannot_be_written(self):
+		# A directory where the save file should be can be neither opened nor cleared, as with a save file the player can't read or write.
+		os.mkdir(self.savepath)
+		output = self.play("NO", "NO", "")
+		self.assertIn("Your save file (savefile.txt beside maincode.py) can't be written, so saving won't work this game.", output)
+		self.assertIn("Enjoy the game!", output)
+		self.assertTrue(os.path.isdir(self.savepath))
+
 	def test_save_records_the_decision_the_player_stopped_at(self):
 		for answers, decision in (
 				(("NO", "SAVE"), "firstdecision"),
