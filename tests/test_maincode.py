@@ -313,6 +313,43 @@ class TestUnwritableSaveFile(GameTestCase):
 				self.assertTrue(output.rstrip().endswith("Press Enter to exit the program."), output)
 
 
+class TestReadOnlySaveFile(GameTestCase):
+
+	def setUp(self):
+		super().setUp()
+		# The save file can be read but not written, as with a read-only file. The game's open() refuses writing, so this holds even when the tests run as root.
+		def readonlyopen(path, mode="r", *args, **kwargs):
+			if "w" in mode:
+				raise PermissionError(13, "Permission denied", path)
+			return open(path, mode, *args, **kwargs)
+		patcher = mock.patch.object(maincode, "open", readonlyopen, create=True)
+		patcher.start()
+		self.addCleanup(patcher.stop)
+
+	def test_resumed_game_reports_that_the_save_failed_and_keeps_the_old_save(self):
+		for decision, answers in (
+				("firstdecision", ("YES", "SAVE")),
+				("firstdecision", ("YES", "YES", "SAVE")),
+				("seconddecision", ("YES", "YES", "SAVE")),
+				("thirddecision", ("YES", "SAVE"))):
+			with self.subTest(decision=decision, answers=answers):
+				self.writesave(decision)
+				output = self.play(*answers, "")
+				self.assertIn("Loading up your save!", output)
+				self.assertIn("Your game couldn't be saved", output)
+				self.assertNotIn("see you later!", output)
+				self.assertEqual(self.readsave(), decision)
+
+	def test_new_game_keeps_the_save_so_it_can_still_be_resumed(self):
+		self.writesave("thirddecision")
+		output = self.play("NO", "NO", "")
+		self.assertIn("Your save file (savefile.txt beside maincode.py) can't be written, so saving won't work this game.", output)
+		self.assertEqual(self.readsave(), "thirddecision")
+		output = self.play("YES", "LEAVE", "")
+		self.assertIn("Loading up your save!", output)
+		self.assertIn("crack open a Pepsi", output)
+
+
 class TestRunningAsAScript(unittest.TestCase):
 
 	def run_copy(self, answers):
